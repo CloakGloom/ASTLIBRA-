@@ -7,4 +7,10 @@ export default defineConfig({
   worker: {
     format: 'es',
   },
+  server: {
+    port: 5555,
+  },
+  preview: {
+    port: 5555,
+  },
 })
