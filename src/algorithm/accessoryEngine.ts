@@ -136,35 +136,23 @@ export function findBestAccessoryCombo(
     if (onProgress && g % 20 === 0) onProgress({ iteration: g + 1, elapsed: Date.now() - t0 })
   }
 
-  // 最终种群评估 + 挑选差异化 Top 3
+  // 最终种群评估 + 挑选最佳方案
   const finals = population.map((ind) => evalInd(ind)).sort((a, b) => b.fitness - a.fitness)
 
-  const top3: AccessoryResult[] = []
-  for (const r of finals) {
-    if (top3.length >= 3) break
-    const ids = new Set(r.items.map((i) => i.id))
-    let similar = false
-    for (const s of top3) {
-      const sids = new Set(s.items.map((i) => i.id))
-      const inter = [...ids].filter((x) => sids.has(x)).length
-      if (inter > Math.max(ids.size, sids.size) * 0.6) {
-        similar = true
-        break
-      }
+  const best = finals[0]
+  if (globalBest && (!best || globalBest.fitness > best.fitness)) {
+    return {
+      results: [globalBest],
+      iterations,
+      elapsed: Date.now() - t0,
+      bestFitness: globalBest.fitness,
     }
-    if (!similar) top3.push(r)
-  }
-  while (top3.length < 3 && finals.length > top3.length) top3.push(finals[top3.length])
-
-  if (globalBest && (top3.length === 0 || globalBest.fitness > top3[0].fitness)) {
-    top3.unshift(globalBest)
-    top3.splice(3)
   }
 
   return {
-    results: top3,
+    results: best ? [best] : [],
     iterations,
     elapsed: Date.now() - t0,
-    bestFitness: top3[0]?.fitness ?? 0,
+    bestFitness: best?.fitness ?? 0,
   }
 }

@@ -12,6 +12,7 @@ import { SaveImportButton, SaveImportResult } from './components/SaveImportButto
 import { AboutButton } from './components/AboutButton'
 import { DEFAULT_WEIGHTS } from './data/presets'
 import REAL_ITEMS from './data/realItems'
+import GAIDEN_ITEMS from './data/realItemsGaiden'
 import { useDebounce } from './hooks/useDebounce'
 import { loadPrefs, savePrefs, saveAccessories, loadItemLocks, saveItemLocks, loadSaveIds, saveSaveIds } from './utils/storage'
 import { Constraints, Item, UserPreferences, Weights } from './types'
@@ -52,11 +53,14 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err
 }
 
 function AppInner() {
-  // 道具库始终从 REAL_ITEMS 初始化，仅通过锁定状态持久化用户修改
+  const [isGaiden, setIsGaiden] = useState(() => localStorage.getItem('mode') === 'gaiden')
+
+  // 道具库：根据模式选择本篇/外传，仅通过锁定状态持久化用户修改
   const [items, setItems] = useState<Item[]>(() => {
+    const db = isGaiden ? GAIDEN_ITEMS : REAL_ITEMS
     const locks = loadItemLocks()
-    if (!locks) return REAL_ITEMS
-    return REAL_ITEMS.map((it) => (locks[it.id] ? { ...it, ...locks[it.id] } : it))
+    if (!locks) return db
+    return db.map((it) => (locks[it.id] ? { ...it, ...locks[it.id] } : it))
   })
   const [prefs, setPrefs] = useState<UserPreferences>(() => loadPrefs() ?? DEFAULT_PREFS)
   const [constraints, setConstraints] = useState<Constraints>(DEFAULT_CONSTRAINTS)
@@ -73,7 +77,7 @@ function AppInner() {
     return ids ? new Set(ids) : new Set()
   })
   const [onlySaveItems, setOnlySaveItems] = useState(true)
-  const [isGaiden, setIsGaiden] = useState(() => localStorage.getItem('mode') === 'gaiden')
+
 
   const workerRef = useRef<Worker | null>(null)
 
@@ -175,17 +179,19 @@ function AppInner() {
     saveAccessories(data.accessories)
     setAccReloadKey((k) => k + 1)
 
-    const idSet = new Set(data.items.map((it) => it.id))
+    // 过滤掉无词条/无效的道具（存档解析中的误识别或未知编号）
+    const validItems = data.items.filter((it) => it.effects.length > 0 && !it.name.startsWith('?#'))
+    const idSet = new Set(validItems.map((it) => it.id))
     setSaveItemIds(idSet)
 
     setItems((prev) => {
       const updated = prev.map((it) => {
-        const saved = data.items.find((s) => s.id === it.id)
+        const saved = validItems.find((s) => s.id === it.id)
         return saved ? { ...it, isLocked: saved.isLocked, lockedSide: saved.lockedSide } : it
       })
-      // 追加数据库中不存在的道具（占位符）
+      // 追加数据库中不存在的有效道具
       const existIds = new Set(updated.map(it => it.id))
-      return [...updated, ...data.items.filter(it => !existIds.has(it.id))]
+      return [...updated, ...validItems.filter(it => !existIds.has(it.id))]
     })
 
     if (data.leftSlots > 0 || data.rightSlots > 0) {
@@ -212,12 +218,22 @@ function AppInner() {
           <Button
             size="small"
             type={!isGaiden ? 'primary' : 'default'}
-            onClick={() => { setIsGaiden(false); localStorage.setItem('mode', 'revision') }}
+            onClick={() => {
+              setIsGaiden(false); localStorage.setItem('mode', 'revision')
+              const locks = loadItemLocks()
+              setItems(locks ? REAL_ITEMS.map(it => locks[it.id] ? { ...it, ...locks[it.id] } : it) : REAL_ITEMS)
+              setSaveItemIds(new Set())
+            }}
           >本篇</Button>
           <Button
             size="small"
             type={isGaiden ? 'primary' : 'default'}
-            onClick={() => { setIsGaiden(true); localStorage.setItem('mode', 'gaiden') }}
+            onClick={() => {
+              setIsGaiden(true); localStorage.setItem('mode', 'gaiden')
+              const locks = loadItemLocks()
+              setItems(locks ? GAIDEN_ITEMS.map(it => locks[it.id] ? { ...it, ...locks[it.id] } : it) : GAIDEN_ITEMS)
+              setSaveItemIds(new Set())
+            }}
           >外伝</Button>
           <SaveImportButton isGaiden={isGaiden} onImport={handleSaveImport} />
           <Button onClick={() => run(items, prefs, constraints)} loading={running}>
@@ -266,7 +282,7 @@ function AppInner() {
           {
             key: 'acc',
             label: '💍 饰品配装',
-            children: <AccessoryModule reloadKey={accReloadKey} />,
+            children: <AccessoryModule reloadKey={accReloadKey} isGaiden={isGaiden} />,
           },
         ]}
       />

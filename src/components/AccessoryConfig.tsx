@@ -1,10 +1,11 @@
 import { Button, InputNumber, Slider, Space } from 'antd'
-import { ACC_SCHOOL_PRESETS } from '../data/accessories'
+import { AccSchoolPreset } from '../data/accessories'
 import { AccessoryCategory, AccessoryWeights, ACC_CATEGORY_LABELS, ACC_CATEGORY_ORDER, ACC_CATEGORY_TO_WEIGHT } from '../types'
 
 interface Props {
   weights: AccessoryWeights
   slotCount: number
+  schoolPresets: AccSchoolPreset[]
   onWeightChange: (w: AccessoryWeights) => void
   onSlotChange: (n: number) => void
   onRun: () => void
@@ -12,7 +13,7 @@ interface Props {
 }
 
 // 饰品配装设置面板（槽位容量 + 流派模板 + 属性权重滑块）
-export function AccessoryConfig({ weights, slotCount, onWeightChange, onSlotChange, onRun, running }: Props) {
+export function AccessoryConfig({ weights, slotCount, schoolPresets, onWeightChange, onSlotChange, onRun, running }: Props) {
   return (
     <div className="panel-card">
       <div className="panel-title">饰品配装设置</div>
@@ -21,7 +22,7 @@ export function AccessoryConfig({ weights, slotCount, onWeightChange, onSlotChan
       <div style={{ marginBottom: 10 }}>
         <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 6 }}>流派一键模板</div>
         <Space wrap>
-          {ACC_SCHOOL_PRESETS.map((s) => (
+          {schoolPresets.map((s) => (
             <Button key={s.key} size="small" onClick={() => onWeightChange(s.weights)}>
               {s.name}
             </Button>

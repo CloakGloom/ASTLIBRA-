@@ -29,9 +29,9 @@ export function AccessoryRadarChart({ data }: Props) {
   useEffect(() => {
     if (!chartRef.current) return
     const dims = ACC_CATEGORY_ORDER.map((c) => ({ key: c, name: ACC_CATEGORY_LABELS[c] }))
-    // 雷达图只展示非负能力值（负值视为无正贡献），坐标上限按绝对值自适应
-    const maxOf = (k: AccessoryCategory) => Math.max(10, ...data.map((d) => Math.abs(d[k])))
-    const indicator = dims.map((d) => ({ name: d.name, max: Math.ceil(maxOf(d.key) * 1.15) }))
+    // 统一上限：所有维度共用数据中的最大值，让强弱差异直观可见
+    const globalMax = Math.max(...data.flatMap((d) => dims.map((dim) => Math.max(0, d[dim.key]))), 1)
+    const indicator = dims.map((d) => ({ name: d.name, max: globalMax }))
     const seriesData = data.map((d, i) => ({
       value: dims.map((dim) => Math.max(0, d[dim.key])),
       name: `方案${i + 1}`,

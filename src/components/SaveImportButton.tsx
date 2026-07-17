@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Button, message } from 'antd'
+import { Button, message, Tooltip } from 'antd'
 import { FolderOpenOutlined } from '@ant-design/icons'
 import { Accessory, Item } from '../types'
 import { extractLoadout, ParsedSave, parseSaveFile, readFileAsArrayBuffer } from '../utils/saveParser'
@@ -39,7 +39,7 @@ export function SaveImportButton({ isGaiden, onImport }: Props) {
       })
 
       message.success(
-        `存档导入成功！饰品 ${loadout.accessories.length} 件、背包道具 ${loadout.allItems.length} 件 ` +
+        `存档导入成功！饰品 ${loadout.accessories.length} 件、增益道具 ${loadout.allItems.length} 件 ` +
         `(左盘 ${loadout.leftSlots} 槽 / 右盘 ${loadout.rightSlots} 槽)`,
       )
     } catch (err: any) {
@@ -54,9 +54,11 @@ export function SaveImportButton({ isGaiden, onImport }: Props) {
   return (
     <>
       <input ref={inputRef} type="file" accept=".DAT,.dat" style={{ display: 'none' }} onChange={handleFile} />
-      <Button icon={<FolderOpenOutlined />} loading={loading} onClick={() => inputRef.current?.click()}>
-        导入存档
-      </Button>
+      <Tooltip title="一般存档路径：C:\Users\用户名\AppData\Local\ASTLIBRA\SAVE">
+        <Button icon={<FolderOpenOutlined />} loading={loading} onClick={() => inputRef.current?.click()}>
+          导入存档
+        </Button>
+      </Tooltip>
     </>
   )
 }

@@ -32,29 +32,29 @@ export function AboutButton() {
       >
         <Space direction="vertical" size={12} style={{ width: '100%' }}>
           <div>
-            <div style={{ color: 'var(--text-dim)', marginBottom: 4 }}>数据来源</div>
-            <a
-              href="https://w.atwiki.jp/astlibra/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: 13 }}
-            >
-              ASTLIBRA @ ウィキ - atwiki
+            <div style={{ color: 'var(--text-dim)', marginBottom: 4 }}>开源仓库</div>
+            <a href="https://github.com/CloakGloom/ASTLIBRA-libra" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13 }}>
+              GitHub - CloakGloom/ASTLIBRA-libra
             </a>
           </div>
           <div>
-            <div style={{ color: 'var(--text-dim)', marginBottom: 4 }}>作者</div>
-            <a
-              href="https://space.bilibili.com/199190474"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: 13 }}
-            >
+            <div style={{ color: 'var(--text-dim)', marginBottom: 4 }}>数据来源</div>
+            <a href="https://w.atwiki.jp/astlibra/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13 }}>
+              ASTLIBRA @ ウィキ - atwiki
+            </a>
+            <br />
+            <a href="https://xiaoheihe.cn/app/bbs/link/118094612" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13 }}>
+              小黑盒 - 全物品数据
+            </a>
+          </div>
+          <div>
+            <div style={{ color: 'var(--text-dim)', marginBottom: 4 }}>程序作者</div>
+            <a href="https://space.bilibili.com/199190474" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13 }}>
               Bilibili 个人空间
             </a>
           </div>
           <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 8 }}>
-            ASTLIBRA 天平配平优化器 · 纯前端 · 遗传算法 / 组合枚举寻优
+            ASTLIBRA 天平配平优化器 · 纯前端 · 本地运行 · 完全免费！！！
           </div>
         </Space>
       </Modal>

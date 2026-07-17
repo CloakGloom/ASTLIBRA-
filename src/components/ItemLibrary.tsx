@@ -125,7 +125,7 @@ export function ItemLibrary({ items, saveItemIds, onlySaveItems, onOnlySaveChang
   return (
     <div className="panel-card">
       <div className="panel-title" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
-        <span>道具仓库（{displayed.length}/{items.length}）</span>
+        <span>道具仓库（{displayed.length}/{items.length}）<span style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 'normal' }}> 仅含增益道具</span></span>
         <Space size={8}>
           <Space size={4}>
             <Switch size="small" checked={filterSave} onChange={setFilterSave} disabled={saveItemIds.size === 0} />

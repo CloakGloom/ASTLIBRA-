@@ -33,7 +33,7 @@ export function DataIO({ exportPayload, onImport, fileName }: Props) {
         onImport(data)
         message.success('配置已导入')
       } catch {
-        message.error('JSON 解析失败')
+        message.error('配置解析失败，请检查文件格式')
       }
     }
     reader.readAsText(file)
@@ -44,9 +44,9 @@ export function DataIO({ exportPayload, onImport, fileName }: Props) {
     <div className="panel-card">
       <div className="panel-title">数据导入 / 导出</div>
       <div style={{ display: 'flex', gap: 10 }}>
-        <Button onClick={exportData}>导出 JSON</Button>
+        <Button onClick={exportData}>导出配置</Button>
         <Upload beforeUpload={beforeUpload} showUploadList={false} accept=".json">
-          <Button>导入 JSON</Button>
+          <Button>导入配置</Button>
         </Upload>
       </div>
     </div>

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button, Col, Row, message } from 'antd'
 import { Accessory, AccessoryPrefs, AccessoryWeights } from '../types'
-import { ACC_ACCESSORIES, DEFAULT_ACCESSORY_WEIGHTS } from '../data/accessories'
+import { ACC_ACCESSORIES, DEFAULT_ACCESSORY_WEIGHTS, ACC_SCHOOL_PRESETS } from '../data/accessories'
+import { GAIDEN_ACCESSORIES, GAIDEN_DEFAULT_WEIGHTS, GAIDEN_SCHOOL_PRESETS } from '../data/accessoriesGaiden'
 import {
   AccessoryResult as ARes,
   AccessoryRunProgress,
@@ -18,17 +19,19 @@ import { useDebounce } from '../hooks/useDebounce'
 const DEFAULT_PREFS: AccessoryPrefs = { weights: DEFAULT_ACCESSORY_WEIGHTS, slotCount: 6 }
 
 // 饰品配装模块：独立 Web Worker 运行遗传算法，避免主界面卡顿
-export function AccessoryModule({ reloadKey }: { reloadKey?: number }) {
-  const [accessories, setAccessories] = useState<Accessory[]>(() => loadAccessories() ?? ACC_ACCESSORIES)
+export function AccessoryModule({ reloadKey, isGaiden }: { reloadKey?: number; isGaiden: boolean }) {
+  const defaultDb = isGaiden ? GAIDEN_ACCESSORIES : ACC_ACCESSORIES
+  const defaultW = isGaiden ? GAIDEN_DEFAULT_WEIGHTS : DEFAULT_ACCESSORY_WEIGHTS
 
-  // 外部触发重载（如导入游戏存档后）
+  const [accessories, setAccessories] = useState<Accessory[]>(() => loadAccessories() ?? defaultDb)
+
+  // 模式切换或外部触发重载时，重新加载饰品数据库
   useEffect(() => {
-    if (reloadKey === undefined || reloadKey === 0) return
-    setAccessories(loadAccessories() ?? ACC_ACCESSORIES)
-    setPrefs(loadAccessoryPrefs() ?? DEFAULT_PREFS)
+    setAccessories(loadAccessories() ?? defaultDb)
+    setPrefs((p) => ({ ...p, weights: defaultW }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reloadKey])
-  const [prefs, setPrefs] = useState<AccessoryPrefs>(() => loadAccessoryPrefs() ?? DEFAULT_PREFS)
+  }, [reloadKey, isGaiden])
+  const [prefs, setPrefs] = useState<AccessoryPrefs>(() => loadAccessoryPrefs() ?? { weights: defaultW, slotCount: 6 })
   const [results, setResults] = useState<ARes[] | null>(null)
   const [running, setRunning] = useState(false)
   const [iterations, setIterations] = useState(0)
@@ -117,6 +120,7 @@ export function AccessoryModule({ reloadKey }: { reloadKey?: number }) {
         <AccessoryConfig
           weights={prefs.weights}
           slotCount={prefs.slotCount}
+          schoolPresets={isGaiden ? GAIDEN_SCHOOL_PRESETS : ACC_SCHOOL_PRESETS}
           onWeightChange={(w: AccessoryWeights) => setPrefs((p) => ({ ...p, weights: w }))}
           onSlotChange={(n) => setPrefs((p) => ({ ...p, slotCount: n }))}
           onRun={() => run(accessories, prefs)}

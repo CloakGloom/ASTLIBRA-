@@ -39,14 +39,11 @@ export function RadarChart({ data }: Props) {
 
   useEffect(() => {
     if (!chartRef.current) return
-    const maxOf = (k: keyof RadarStats) => {
-      const vals = data.map((d) => d[k])
-      const m = Math.max(1, ...vals.filter(v => v > 0))
-      return Math.ceil(m * 1.3)
-    }
-    const indicator = DIMS.map((d) => ({ name: d.name, max: maxOf(d.key) }))
+    // 统一上限：所有维度共用数据中的最大值，让强弱差异直观可见
+    const globalMax = Math.max(...data.flatMap((d) => DIMS.map((dim) => Math.max(0, d[dim.key]))), 1)
+    const indicator = DIMS.map((dim) => ({ name: dim.name, max: globalMax }))
     const seriesData = data.map((d, i) => ({
-      value: DIMS.map((dim) => d[dim.key]),
+      value: DIMS.map((dim) => Math.max(0, d[dim.key])),
       name: `方案${i + 1}`,
       itemStyle: { color: COLORS[i % COLORS.length] },
       areaStyle: { opacity: 0.15 },

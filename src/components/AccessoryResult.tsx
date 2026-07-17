@@ -44,14 +44,14 @@ export function AccessoryResult({ results, allItems, onReplace }: Props) {
     return (
       <div className="panel-card" style={{ minHeight: 300 }}>
         <div className="panel-title">配装方案</div>
-        <Empty description="配置好偏好后点击「开始配装」生成 Top 3 方案" />
+        <Empty description="配置好偏好后点击「开始配装」生成配装方案" />
       </div>
     )
   }
 
   return (
     <div className="panel-card">
-      <div className="panel-title">配装方案（Top {results.length}）</div>
+      <div className="panel-title">配装方案</div>
       {results.map((r, i) => {
         const other = results[i + 1]
         return (
